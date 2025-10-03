@@ -1,13 +1,13 @@
-' lockscreen_corrected.vbs
+' lockscreen_final.vbs
 Option Explicit
 
 Dim fso, shell, htaPath, htaText
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set shell = CreateObject("WScript.Shell")
 
-htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta" ' Temp HTA
+htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta" ' Temp HTA path
 
-' Create HTA content
+' Build HTA content with properly escaped quotes
 htaText = _
 "<html>" & vbCrLf & _
 "<head>" & vbCrLf & _
@@ -27,7 +27,12 @@ htaText = _
 "    <script language=""VBScript"">" & vbCrLf & _
 "        Sub pw_onkeypress" & vbCrLf & _
 "            If window.event.keyCode = 13 Then" & vbCrLf & _
-"                If LCase(Trim(pw.value)) = ""coffee"" Then window.close Else info.innerText = ""Wrong password!!"": pw.value = """"" & vbCrLf & _
+"                If LCase(Trim(pw.value)) = ""coffee"" Then" & vbCrLf & _
+"                    window.close" & vbCrLf & _
+"                Else" & vbCrLf & _
+"                    info.innerText = ""Wrong password!!""" & vbCrLf & _
+"                    pw.value = """"" & vbCrLf & _
+"                End If" & vbCrLf & _
 "            End If" & vbCrLf & _
 "        End Sub" & vbCrLf & _
 "    </script>" & vbCrLf & _
@@ -53,7 +58,7 @@ htaText = _
 "</body>" & vbCrLf & _
 "</html>"
 
-' Write HTA
+' Write HTA file
 If fso.FileExists(htaPath) Then fso.DeleteFile htaPath, True
 Dim htaFile
 Set htaFile = fso.CreateTextFile(htaPath, True, False)
@@ -61,5 +66,5 @@ htaFile.Write htaText
 htaFile.Close
 Set htaFile = Nothing
 
-' Launch HTA
+' Launch the HTA
 shell.Run "mshta.exe """ & htaPath & """", 1, False
