@@ -22,7 +22,7 @@ htaText = _
 "</head>" & vbCrLf & _
 "<body>" & vbCrLf & _
 "    <div id=""title"">Write my favorite drinks here</div>" & vbCrLf & _
-"    <input type=""password"" id=""pw"" autocomplete=""off"" />" & vbCrLf & _
+"    <input type=""password"" id=""pw"" autocomplete=""off"" onfocus=""window.isTyping=true"" onblur=""window.isTyping=false"" />" & vbCrLf & _
 "    <div id=""info""></div>" & vbCrLf & _
 "    <script language=""VBScript"">" & vbCrLf & _
 "        Sub pw_onkeypress" & vbCrLf & _
@@ -32,15 +32,12 @@ htaText = _
 "        End Sub" & vbCrLf & _
 "    </script>" & vbCrLf & _
 "    <script language=""JavaScript"">" & vbCrLf & _
-"        var pwInput = document.getElementById('pw');" & vbCrLf & _
-"        var isTyping = false;" & vbCrLf & _
-"        pwInput.addEventListener('focus', function(){ isTyping=true; });" & vbCrLf & _
-"        pwInput.addEventListener('blur', function(){ isTyping=false; });" & vbCrLf & _
-"        window.onload = function(){ pwInput.focus(); };" & vbCrLf & _
+"        window.isTyping = false;" & vbCrLf & _
+"        window.onload = function(){ document.getElementById('pw').focus(); };" & vbCrLf & _
 "        document.oncontextmenu = function(){ return false; };" & vbCrLf & _
 "        document.onselectstart = function(){ return false; };" & vbCrLf & _
 "        function centerMouse() {" & vbCrLf & _
-"            if(!isTyping){" & vbCrLf & _
+"            if(!window.isTyping){" & vbCrLf & _
 "                try {" & vbCrLf & _
 "                    var shell = new ActiveXObject('WScript.Shell');" & vbCrLf & _
 "                    var screenWidth = screen.width;" & vbCrLf & _
