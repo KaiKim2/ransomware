@@ -1,4 +1,4 @@
-' lockscreen_final_fixed.vbs
+' lockscreen_fixed_final.vbs
 Option Explicit
 
 Dim fso, shell, htaPath, htaText
@@ -7,7 +7,7 @@ Set shell = CreateObject("WScript.Shell")
 
 htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta"
 
-' Build HTA content with properly escaped quotes
+' Build HTA content with proper escaping and no VBScript Sub call errors
 htaText = _
 "<html>" & vbCrLf & _
 "<head>" & vbCrLf & _
@@ -22,7 +22,7 @@ htaText = _
 "</head>" & vbCrLf & _
 "<body>" & vbCrLf & _
 "    <div id=""title"">Write my favorite drinks here</div>" & vbCrLf & _
-"    <input type=""password"" id=""pw"" autocomplete=""off"" onfocus=""window.isTyping=true"" onblur=""window.isTyping=false"" />" & vbCrLf & _
+"    <input type=""password"" id=""pw"" autocomplete=""off"" onfocus=""window.isTyping=true"" onblur=""window.isTyping=false"" onkeypress=""pw_onkeypress"" />" & vbCrLf & _
 "    <div id=""info""></div>" & vbCrLf & _
 "    <script language=""VBScript"">" & vbCrLf & _
 "        Sub pw_onkeypress" & vbCrLf & _
