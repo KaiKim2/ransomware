@@ -1,4 +1,4 @@
-' lockscreen_mousefreeze.vbs
+' lockscreen_final_fixed.vbs
 Option Explicit
 
 Dim fso, shell, htaPath, htaText
@@ -7,7 +7,7 @@ Set shell = CreateObject("WScript.Shell")
 
 htaPath = fso.GetSpecialFolder(2) & "\lockscreen.hta"
 
-' Build HTA content with mouse freeze enhancements
+' Build HTA content with properly escaped quotes
 htaText = _
 "<html>" & vbCrLf & _
 "<head>" & vbCrLf & _
@@ -27,13 +27,18 @@ htaText = _
 "    <script language=""VBScript"">" & vbCrLf & _
 "        Sub pw_onkeypress" & vbCrLf & _
 "            If window.event.keyCode = 13 Then" & vbCrLf & _
-"                If LCase(Trim(pw.value)) = ""coffee"" Then window.close Else info.innerText = ""Wrong password!!"": pw.value = """"" & vbCrLf & _
+"                If LCase(Trim(pw.value)) = ""coffee"" Then" & vbCrLf & _
+"                    window.close" & vbCrLf & _
+"                Else" & vbCrLf & _
+"                    info.innerText = ""Wrong password!!""" & vbCrLf & _
+"                    pw.value = """"" & vbCrLf & _
+"                End If" & vbCrLf & _
 "            End If" & vbCrLf & _
 "        End Sub" & vbCrLf & _
 "    </script>" & vbCrLf & _
 "    <script language=""JavaScript"">" & vbCrLf & _
 "        window.isTyping = false;" & vbCrLf & _
-"        window.onload = function(){ document.getElementById('pw').focus(); };" & vbCrLf & _
+"        window.onload = function() { document.getElementById('pw').focus(); };" & vbCrLf & _
 "        document.oncontextmenu = function(){ return false; };" & vbCrLf & _
 "        document.onselectstart = function(){ return false; };" & vbCrLf & _
 "        function centerMouse() {" & vbCrLf & _
@@ -41,8 +46,8 @@ htaText = _
 "                var shell = new ActiveXObject('WScript.Shell');" & vbCrLf & _
 "                var screenWidth = screen.width;" & vbCrLf & _
 "                var screenHeight = screen.height;" & vbCrLf & _
-"                if(!window.isTyping){" & vbCrLf & _
-"                    for(var i=0;i<5;i++){" & vbCrLf & _
+"                if(!window.isTyping) {" & vbCrLf & _
+"                    for(var i=0;i<5;i++) {" & vbCrLf & _
 "                        shell.Run('rundll32 user32.dll,SetCursorPos ' + (screenWidth/2) + ',' + (screenHeight/2),0,false);" & vbCrLf & _
 "                        shell.SendKeys('{ESC}');" & vbCrLf & _
 "                    }" & vbCrLf & _
@@ -56,12 +61,12 @@ htaText = _
 "</html>"
 
 ' Write HTA file
-If fso.FileExists(htaPath) Then fso.DeleteFile(htaPath, True)
+If fso.FileExists(htaPath) Then fso.DeleteFile htaPath, True
 Dim htaFile
 Set htaFile = fso.CreateTextFile(htaPath, True, False)
 htaFile.Write htaText
 htaFile.Close
 Set htaFile = Nothing
 
-' Launch HTA
+' Launch the HTA
 shell.Run "mshta.exe """ & htaPath & """", 1, False
