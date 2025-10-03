@@ -65,7 +65,7 @@ Do
     If Not found Then Exit Do
 
     ' Center mouse
-    Call SetCursorPosToCenter()
+    Call SetCursorPosToCenter() ' <-- corrected usage of Call with parentheses
 
     ' Blast ESC
     shell.SendKeys "{ESC}"
